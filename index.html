@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><script src="https://myhub.ia.br/canvas-vendor/tailwind.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel RDA | Cast</title>
+<style>
+  :root {
+    --bg: #08111f;
+    --panel: #101d30;
+    --card: #17263b;
+    --text: #f4f7fb;
+    --muted: #a7b5c9;
+    --line: rgba(255,255,255,.11);
+    --cyan: #52d6e8;
+    --blue: #6d9eff;
+    --amber: #ffc857;
+    --green: #4fd1a1;
+    --purple: #b59cff;
+    --red: #ff9292;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; }
+  body { min-height: 100vh; }
+  .app { min-height: 100vh; padding: 24px 30px 20px; display: flex; flex-direction: column; gap: 20px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .mark { width: 54px; height: 54px; border-radius: 15px; display: grid; place-items: center; color: #07121c; font-weight: 900; font-size: 20px; background: linear-gradient(135deg, var(--cyan), #7da9ff); box-shadow: 0 8px 30px rgba(82,214,232,.22); }
+  h1 { margin: 0; font-size: clamp(24px, 2.2vw, 38px); letter-spacing: -.04em; }
+  .subtitle { color: var(--muted); margin-top: 5px; font-size: clamp(12px, 1vw, 16px); }
+  .right-head { display: flex; align-items: center; gap: 18px; }
+  .live { display: flex; align-items: center; gap: 8px; color: #c6d2e3; font-size: 12px; letter-spacing: .08em; font-weight: 700; white-space: nowrap; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px var(--amber); }
+  .dot.ok { background: var(--green); box-shadow: 0 0 12px var(--green); }
+  .datebox { text-align: right; min-width: 160px; }
+  .time { font-size: clamp(22px, 2vw, 32px); font-weight: 750; font-variant-numeric: tabular-nums; }
+  .date { color: var(--muted); font-size: 13px; margin-top: 2px; text-transform: capitalize; }
+  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn { border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; color: var(--text); background: #17263b; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; }
+  .btn:hover { background: #223752; }
+  .refresh-status { color: var(--muted); font-size: 11px; text-align: right; }
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .metric { background: linear-gradient(145deg, #162940, #101b2c); border: 1px solid rgba(151,185,225,.18); border-radius: 15px; padding: 14px 17px; display: flex; align-items: center; justify-content: space-between; min-height: 76px; box-shadow: 0 7px 20px rgba(0,0,0,.14); transition: transform .18s ease, border-color .18s ease; }
+  .metric:hover { transform: translateY(-2px); border-color: rgba(82,214,232,.38); }
+  .metric-label { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .metric-value { font-size: 26px; line-height: 1; font-weight: 800; }
+  .metric-icon { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; font-size: 17px; background: rgba(255,255,255,.07); }
+  .board { flex: 1; min-height: 320px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  @media (min-width: 901px) and (max-width: 1250px) {
+    .board { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .right-head { flex-wrap: wrap; justify-content: flex-end; }
+  }
+  .column { background: linear-gradient(160deg, rgba(18,34,55,.96), rgba(13,25,42,.96)); border: 1px solid rgba(151,185,225,.15); border-radius: 16px; padding: 13px; display: flex; flex-direction: column; min-height: 0; box-shadow: 0 8px 22px rgba(0,0,0,.12); }
+  .column-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 11px; border-bottom: 1px solid var(--line); margin-bottom: 10px; gap: 6px; }
+  .column-title { display: flex; align-items: center; gap: 8px; font-size: clamp(12px, 1.05vw, 16px); font-weight: 750; white-space: nowrap; }
+  .column-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .count { font-size: 12px; color: var(--muted); background: rgba(255,255,255,.07); padding: 4px 8px; border-radius: 99px; font-weight: 700; }
+  .cards { overflow: auto; display: flex; flex-direction: column; gap: 9px; padding-right: 2px; }
+  .cards::-webkit-scrollbar { width: 4px; }
+  .cards::-webkit-scrollbar-thumb { background: #334761; border-radius: 10px; }
+  .task { background: linear-gradient(145deg, #1a2b42, #162438); border: 1px solid rgba(255,255,255,.09); border-radius: 12px; padding: 12px 13px; box-shadow: 0 5px 14px rgba(0,0,0,.16); transition: transform .16s ease, border-color .16s ease; }
+  .task:hover { transform: translateY(-2px); border-color: rgba(82,214,232,.3); }
+  .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .id { color: #91a4bd; font-size: 10px; letter-spacing: .08em; font-weight: 800; }
+  .priority { font-size: 9px; letter-spacing: .06em; font-weight: 800; padding: 4px 7px; border-radius: 99px; white-space: nowrap; }
+  .p-high { color: #ffb7b7; background: rgba(255,100,100,.13); }
+  .p-med { color: #ffdb8e; background: rgba(255,200,87,.13); }
+  .p-low { color: #a9d7ff; background: rgba(109,158,255,.13); }
+  .task h3 { margin: 0 0 7px; font-size: clamp(12px, .96vw, 15px); line-height: 1.28; letter-spacing: -.01em; }
+  .desc { color: #b5c2d3; font-size: clamp(10px, .78vw, 12px); line-height: 1.4; margin: 0 0 9px; overflow-wrap: anywhere; }
+  .task-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08); }
+  .meta-label { color: #8294ab; font-size: 9px; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px; }
+  .meta-value { font-size: clamp(10px, .76vw, 12px); color: #e7edf5; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+  .kpi { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 2px; padding: 7px 8px; border-radius: 8px; background: rgba(255,255,255,.045); gap: 8px; }
+  .kpi span:first-child { color: #a9b8ca; font-size: 10px; }
+  .kpi strong { font-size: 11px; color: var(--cyan); text-align: right; overflow-wrap: anywhere; }
+  .empty { color: #9aabc0; text-align: center; padding: 25px 12px; font-size: 12px; line-height: 1.6; }
+  .empty.error { color: #ffd0d0; background: rgba(255,120,120,.06); border: 1px solid rgba(255,146,146,.18); border-radius: 12px; }
+  .sheet-frame-wrap { grid-column: 1 / -1; min-height: 560px; display: flex; flex-direction: column; overflow: hidden; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+  .sheet-frame-head { padding: 12px 16px; color: #dce8f5; background: #101d30; font-size: 13px; line-height: 1.5; }
+  .sheet-frame { flex: 1; width: 100%; min-height: 520px; border: 0; background: #fff; }
+  .footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #8495aa; font-size: 11px; }
+  .cycle { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .cycle b { color: #d3deeb; font-weight: 650; }
+  .sep { color: #4d6179; }
+  .tag { border: 1px solid rgba(255,255,255,.12); padding: 5px 9px; border-radius: 99px; color: #b2c0d1; }
+  @media (max-width: 900px) {
+    .app { padding: 18px; }
+    .topbar { align-items: flex-start; flex-direction: column; }
+    .right-head { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .column { min-height: 280px; }
+    .datebox { min-width: auto; }
+  }
+  @media (max-width: 700px) {
+    .app { padding: 16px; }
+    .topbar { align-items: flex-start; flex-direction: column; }
+    .right-head { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    .summary { grid-template-columns: repeat(2, 1fr); }
+    .board { grid-template-columns: 1fr; }
+    .column { min-height: 220px; }
+    .footer { align-items: flex-start; flex-direction: column; }
+    .datebox { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">RDA</div>
+      <div>
+        <h1>Painel de Alinhamento</h1>
+        <div class="subtitle">CAST Móveis Planejados <span style="color:#52677f">•</span> Logística e Operações</div>
+      </div>
+    </div>
+    <div class="right-head">
+      <div class="live" id="connectionStatus"><span class="dot"></span> CONECTANDO À PLANILHA</div>
+      <div class="controls">
+        <button class="btn" id="refreshButton" type="button">↻ Atualizar agora</button>
+        <a class="btn" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSDAeLf45g7bTRDTxoIEncgQTr9Kbl1psirCjljempk461yfVCO2XZWMm0I-Vv5_A/pubhtml?gid=200264193&amp;single=true" target="_blank" rel="noopener">Abrir planilha publicada</a>
+        <div class="refresh-status" id="refreshStatus">Carregando dados publicados…</div>
+      </div>
+      <div class="datebox">
+        <div class="time" id="clock">--:--</div>
+        <div class="date" id="today">--</div>
+      </div>
+    </div>
+  </header>
+
+  <section class="summary" id="summary"></section>
+  <main class="board" id="board">
+    <section class="column" style="grid-column:1/-1"><div class="empty">Conectando à planilha publicada…</div></section>
+  </main>
+
+  <footer class="footer">
+    <div class="cycle">
+      <span><b>RDA</b></span><span class="sep">›</span>
+      <span>Informação</span><span class="sep">›</span>
+      <span>Plano</span><span class="sep">›</span>
+      <span>Ação</span><span class="sep">›</span>
+      <span>Resultado</span>
+    </div>
+    <div class="tag">ABA CONECTADA: gid=200264193 • ATUALIZAÇÃO AUTOMÁTICA A CADA 30s</div>
+  </footer>
+</div>
+
+<script>
+const spreadsheetId = "1cByWoCJKlqKHMx2G_WmBwWw4Lex0GTF-";
+const publishedId = "2PACX-1vSDAeLf45g7bTRDTxoIEncgQTr9Kbl1psirCjljempk461yfVCO2XZWMm0I-Vv5_A";
+const sheetGid = "200264193";
+const publishedSheetUrl = `https://docs.google.com/spreadsheets/d/e/${publishedId}/pubhtml?gid=${sheetGid}&single=true&widget=true&headers=false`;
+const stages = [
+  { id: "informacao", title: "Informação", color: "#52d6e8" },
+  { id: "plano", title: "Plano definido", color: "#6d9eff" },
+  { id: "acao", title: "Em execução", color: "#ffc857" },
+  { id: "medicao", title: "Medindo resultado", color: "#b59cff" },
+  { id: "concluido", title: "Concluído", color: "#4fd1a1" }
+];
+
+let plans = [];
+let requestNumber = 0;
+let dataLoaded = false;
+
+const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[char]));
+
+const normalize = value => String(value ?? "")
+  .replace(/^\uFEFF/, "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toUpperCase()
+  .replace(/[^A-Z0-9]+/g, " ")
+  .trim();
+
+const priorityClass = value => {
+  const priority = normalize(value);
+  return priority === "ALTA" ? "p-high" : priority === "MEDIA" ? "p-med" : "p-low";
+};
+
+function inferStage(plan) {
+  const result = normalize(plan.resultado);
+  if (result.includes("CONCLUIDO") || result.includes("FINALIZADO") || result.includes("EXECUTADO") || result.includes("ENCERRADO")) {
+    return "concluido";
+  }
+  if (result) return "medicao";
+  if (plan.acao) return "acao";
+  if (plan.titulo) return "plano";
+  return "informacao";
+}
+
+function loadPlans(csvRows) {
+  if (!Array.isArray(csvRows) || csvRows.length < 1) {
+    throw new Error("A planilha publicada não retornou linhas para leitura.");
+  }
+
+  const headers = csvRows[0].map(value => normalize(value));
+  const findColumn = aliases => headers.findIndex(header => aliases.some(alias => header === normalize(alias)));
+
+  const positions = {
+    informacao: findColumn(["INFORMAÇÃO", "INFORMACAO"]),
+    titulo: findColumn(["TÍTULO DO PLANO", "TITULO DO PLANO", "TÍTULO", "TITULO"]),
+    acao: findColumn(["DESCRIÇÃO / AÇÃO PLANEJADA", "DESCRICAO / ACAO PLANEJADA", "DESCRIÇÃO ACAO PLANEJADA", "DESCRICAO ACAO PLANEJADA", "AÇÃO PLANEJADA", "ACAO PLANEJADA"]),
+    responsavel: findColumn(["RESPONSÁVEL", "RESPONSAVEL"]),
+    prazo: findColumn(["PRAZO"]),
+    prioridade: findColumn(["PRIORIDADE"]),
+    resultado: findColumn(["RESULTADO"])
+  };
+
+  const missing = Object.entries(positions).filter(([, index]) => index < 0).map(([key]) => key);
+  if (missing.length) {
+    throw new Error("Não encontrei os cabeçalhos necessários. Cabeçalhos recebidos: " + csvRows[0].join(" | "));
+  }
+
+  const valueAt = (row, index) => String(row[index] ?? "").trim();
+
+  return csvRows.slice(1).map((row, index) => {
+    const plan = {
+      id: `RDA-${String(index + 1).padStart(3, "0")}`,
+      informacao: valueAt(row, positions.informacao),
+      titulo: valueAt(row, positions.titulo),
+      acao: valueAt(row, positions.acao),
+      responsavel: valueAt(row, positions.responsavel),
+      prazo: valueAt(row, positions.prazo),
+      prioridade: valueAt(row, positions.prioridade),
+      resultado: valueAt(row, positions.resultado)
+    };
+    plan.stage = inferStage(plan);
+    return plan;
+  }).filter(plan => [
+    plan.informacao, plan.titulo, plan.acao, plan.responsavel,
+    plan.prazo, plan.prioridade, plan.resultado
+  ].some(value => value !== ""));
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (char === '"' && quoted && text[i + 1] === '"') {
+      field += '"';
+      i++;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(field);
+      field = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && text[i + 1] === "\n") i++;
+      row.push(field);
+      if (row.some(cell => cell.trim() !== "")) rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+
+  row.push(field);
+  if (row.some(cell => cell.trim() !== "")) rows.push(row);
+  return rows;
+}
+
+function renderSummary() {
+  const open = plans.filter(plan => plan.stage !== "concluido").length;
+  const running = plans.filter(plan => plan.stage === "acao").length;
+  const measuring = plans.filter(plan => plan.stage === "medicao").length;
+  const done = plans.filter(plan => plan.stage === "concluido").length;
+  const metrics = [
+    ["Planos em acompanhamento", open, "◉", "#52d6e8"],
+    ["Ações em execução", running, "↗", "#ffc857"],
+    ["Em medição", measuring, "◎", "#b59cff"],
+    ["Concluídos", done, "✓", "#4fd1a1"]
+  ];
+
+  document.getElementById("summary").innerHTML = metrics.map(metric =>
+    `<div class="metric"><div><div class="metric-label">${metric[0]}</div><div class="metric-value" style="color:${metric[3]}">${dataLoaded ? metric[1] : "—"}</div></div><div class="metric-icon" style="color:${metric[3]}">${metric[2]}</div></div>`
+  ).join("");
+}
+
+function renderBoard(message = "", isError = false) {
+  if (message && isError) {
+    document.getElementById("board").innerHTML =
+      `<section class="error-panel">
+        <strong>Não foi possível sincronizar os dados agora.</strong>
+        ${escapeHtml(message)}
+        <br>Confira a publicação da aba e use “Atualizar agora” para tentar novamente.
+      </section>`;
+    return;
+  }
+  if (message) {
+    document.getElementById("board").innerHTML =
+      `<section class="column" style="grid-column:1/-1"><div class="empty">${escapeHtml(message)}</div></section>`;
+    return;
+  }
+
+  if (!plans.length) {
+    document.getElementById("board").innerHTML =
+      '<section class="column" style="grid-column:1/-1"><div class="empty">A planilha foi lida, mas não há planos preenchidos nesta aba.</div></section>';
+    return;
+  }
+
+  document.getElementById("board").innerHTML = stages.map(stage => {
+    const items = plans.filter(plan => plan.stage === stage.id);
+    const cards = items.length ? items.map(plan => `
+      <article class="task">
+        <div class="task-top">
+          <span class="id">${escapeHtml(plan.id)}</span>
+          <span class="priority ${priorityClass(plan.prioridade)}">${escapeHtml(plan.prioridade || "SEM PRIORIDADE")}</span>
+        </div>
+        <h3><span class="meta-label">Título do plano</span><br>${escapeHtml(plan.titulo || "Sem título")}</h3>
+        <p class="desc"><strong>INFORMAÇÃO:</strong> ${escapeHtml(plan.informacao || "Não informado")}</p>
+        <p class="desc"><strong>Descrição / ação planejada:</strong> ${escapeHtml(plan.acao || "Não informado")}</p>
+        <div class="task-meta">
+          <div><div class="meta-label">Responsável</div><div class="meta-value">${escapeHtml(plan.responsavel || "Não informado")}</div></div>
+          <div><div class="meta-label">Prazo</div><div class="meta-value">${escapeHtml(plan.prazo || "Não informado")}</div></div>
+          <div class="kpi"><span>RESULTADO</span><strong>${escapeHtml(plan.resultado || "Ainda não registrado")}</strong></div>
+        </div>
+      </article>`).join("") : '<div class="empty">Nenhum plano nesta etapa.</div>';
+
+    return `<section class="column">
+      <div class="column-head">
+        <div class="column-title"><span class="column-dot" style="background:${stage.color};box-shadow:0 0 10px ${stage.color}66"></span>${stage.title}</div>
+        <span class="count">${items.length}</span>
+      </div>
+      <div class="cards">${cards}</div>
+    </section>`;
+  }).join("");
+}
+
+function setConnection(message, connected) {
+  const status = document.getElementById("connectionStatus");
+  status.innerHTML = `<span class="dot${connected ? " ok" : ""}"></span> ${escapeHtml(message)}`;
+}
+
+async function loadPublishedTable() {
+  const csvUrl = `https://docs.google.com/spreadsheets/d/e/${publishedId}/pub?gid=${sheetGid}&single=true&output=csv&cache=${Date.now()}`;
+
+  try {
+    const response = await fetch(csvUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`O Google respondeu com status ${response.status}.`);
+
+    const text = await response.text();
+    if (!text || text.trim().startsWith("<!DOCTYPE") || text.trim().startsWith("<html")) {
+      throw new Error("O Google não retornou o CSV publicado da aba.");
+    }
+
+    const rows = parseCsv(text);
+    if (!rows.length) throw new Error("O CSV publicado veio vazio.");
+    return rows;
+  } catch (csvError) {
+    return await loadGvizFallback(csvError);
+  }
+}
+
+function loadGvizFallback(previousError) {
+  return new Promise((resolve, reject) => {
+    const callbackName = `rdaCallback_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+    const script = document.createElement("script");
+    let settled = false;
+
+    const timeout = setTimeout(() => {
+      finish(new Error("A leitura CSV e a alternativa Google Sheets falharam."));
+    }, 15000);
+
+    function finish(error, data) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      script.remove();
+      delete window[callbackName];
+
+      if (error) {
+        reject(new Error(`${error.message} Detalhe CSV: ${previousError.message}`));
+      } else {
+        const table = data && data.table;
+        if (!table || !Array.isArray(table.cols) || !Array.isArray(table.rows)) {
+          reject(new Error("O Google não retornou uma tabela de dados."));
+          return;
+        }
+
+        let headers = table.cols.map((column, index) => column.label || column.id || `COLUNA ${index + 1}`);
+        let body = table.rows.map(row => table.cols.map((_, index) => {
+          const cell = row.c && row.c[index];
+          return cell ? String(cell.f ?? cell.v ?? "").trim() : "";
+        }));
+
+        const normalizedHeaders = headers.map(normalize);
+        const requiredHeaders = ["INFORMACAO", "RESPONSAVEL", "PRAZO", "PRIORIDADE", "RESULTADO"];
+        const headersAreUsable = requiredHeaders.every(header => normalizedHeaders.includes(header));
+
+        if (!headersAreUsable && body.length) {
+          const firstRowHeaders = body[0].map(normalize);
+          const firstRowHasHeaders = requiredHeaders.every(header => firstRowHeaders.includes(header));
+          if (firstRowHasHeaders) {
+            headers = body.shift();
+          }
+        }
+
+        resolve([headers, ...body]);
+      }
+    }
+
+    window[callbackName] = data => {
+      if (!data || (data.errors && data.errors.length)) {
+        finish(new Error("A alternativa do Google Sheets não conseguiu ler a aba publicada."));
+        return;
+      }
+      finish(null, data);
+    };
+
+    script.onerror = () => finish(new Error("Não foi possível carregar os dados da planilha."));
+    const endpoint = new URL(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq`);
+    endpoint.searchParams.set("gid", sheetGid);
+    endpoint.searchParams.set("headers", "1");
+    endpoint.searchParams.set("tqx", `out:json;responseHandler:${callbackName}`);
+    endpoint.searchParams.set("_", String(Date.now()));
+    script.src = endpoint.toString();
+    document.head.appendChild(script);
+  });
+}
+
+async function refreshPlans() {
+  const currentRequest = ++requestNumber;
+  const button = document.getElementById("refreshButton");
+  button.disabled = true;
+  button.textContent = "↻ Carregando…";
+  setConnection("CONECTANDO À PLANILHA", false);
+  document.getElementById("refreshStatus").textContent = "Consultando a aba publicada…";
+
+  try {
+    const rows = await loadPublishedTable();
+    if (currentRequest !== requestNumber) return;
+
+    plans = loadPlans(rows);
+    dataLoaded = true;
+    renderSummary();
+    renderBoard();
+    setConnection("PLANILHA CONECTADA", true);
+
+    const now = new Intl.DateTimeFormat("pt-BR", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
+    }).format(new Date());
+    document.getElementById("refreshStatus").textContent = `Dados atualizados às ${now} • ${plans.length} plano(s) lido(s)`;
+  } catch (error) {
+    if (currentRequest !== requestNumber) return;
+    dataLoaded = false;
+    renderSummary();
+    setConnection("FALHA NA CONEXÃO", false);
+    document.getElementById("refreshStatus").textContent = "Atualização falhou. Tente novamente pelo botão.";
+    renderBoard(`Não foi possível carregar os dados da planilha. ${error.message} Confira se a publicação está ativa e se a aba publicada é a de gid=${sheetGid}.`, true);
+  } finally {
+    if (currentRequest === requestNumber) {
+      button.disabled = false;
+      button.textContent = "↻ Atualizar agora";
+    }
+  }
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit", minute: "2-digit"
+  }).format(now);
+  document.getElementById("today").textContent = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric"
+  }).format(now);
+}
+
+document.getElementById("refreshButton").addEventListener("click", refreshPlans);
+renderSummary();
+updateClock();
+refreshPlans();
+setInterval(refreshPlans, 30000);
+setInterval(updateClock, 30000);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) refreshPlans();
+});
+</script>
+</body>
+</html>
