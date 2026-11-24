@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><script src="https://myhub.ia.br/canvas-vendor/tailwind.js"></script>
+<head>
+  <script src="https://myhub.ia.br/canvas-vendor/tailwind.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel RDA | Cast</title>
@@ -50,22 +51,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 24px;
       text-align: center;
     }
 
     .mark {
-      width: 62px;
-      height: 62px;
-      flex: 0 0 62px;
-      border-radius: 17px;
+      width: 140px;
+      height: 140px;
+      flex: 0 0 140px;
+      border-radius: 40px;
       display: grid;
       place-items: center;
       color: #08233d;
       font-weight: 900;
-      font-size: 20px;
+      font-size: 44px;
       background: linear-gradient(135deg, #72d8e8, #8eafff);
-      box-shadow: 0 8px 24px rgba(53,105,200,.16);
+      box-shadow: 0 12px 32px rgba(53,105,200,.18);
     }
 
     .brand-copy { text-align: center; }
@@ -73,11 +74,11 @@
     h1 {
       margin: 0;
       color: #17385f;
-      font-size: clamp(30px, 3.4vw, 58px);
+      font-size: clamp(66px, 7vw, 126px) !important;
       text-shadow: 0 2px 10px rgba(7,137,168,.18);
-      font-weight: 850;
+      font-weight: 850 !important;
       letter-spacing: -.02em;
-      line-height: 1.12;
+      line-height: 1.1;
     }
 
     .subtitle {
@@ -85,9 +86,9 @@
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: clamp(22px, 2vw, 32px);
+      gap: 10px;
+      margin-top: 10px;
+      font-size: clamp(20px, 1.8vw, 30px);
       line-height: 1.35;
     }
 
@@ -119,30 +120,6 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 8px;
-    }
-
-    .live {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #40536b;
-      font-size: 11px;
-      letter-spacing: .06em;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--amber);
-      box-shadow: 0 0 10px rgba(169,99,0,.45);
-    }
-
-    .dot.ok {
-      background: var(--green);
-      box-shadow: 0 0 10px rgba(19,132,94,.4);
     }
 
     .datebox {
@@ -247,12 +224,12 @@
     }
 
     .board {
-    flex: 1;
-    min-height: 320px;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-  }
+      flex: 1;
+      min-height: 320px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
 
     .column {
       min-height: 0;
@@ -329,9 +306,9 @@
     .task.stage-medicao { --stage-color: #7451b8; }
     .task.stage-concluido { --stage-color: #13845e; }
 
-        .task.stage-medicao .task-top,
-        .task.stage-medicao .task-title-label,
-        .task.stage-medicao .task-meta { display: none; }
+    .task.stage-medicao .task-top,
+    .task.stage-medicao .task-title-label,
+    .task.stage-medicao .task-meta { display: none; }
 
     .task-top {
       display: flex;
@@ -385,7 +362,7 @@
     .desc {
       margin: 0 0 9px;
       color: #43546a;
-      font-size: clamp(16px, 1.3vw, 24px);
+      font-size: clamp(16px, 1.25vw, 22px);
       line-height: 1.45;
       overflow-wrap: anywhere;
     }
@@ -401,14 +378,14 @@
     .meta-label {
       margin-bottom: 3px;
       color: #607187;
-      font-size: 9px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: .07em;
     }
 
     .meta-value {
       color: #23364d;
-      font-size: clamp(10px, .76vw, 12px);
+      font-size: clamp(15px, 1.1vw, 20px);
       font-weight: 750;
       line-height: 1.3;
       overflow-wrap: anywhere;
@@ -428,13 +405,13 @@
 
     .kpi span:first-child {
       color: #52647b;
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 800;
     }
 
     .kpi strong {
       color: var(--cyan);
-      font-size: 11px;
+      font-size: 15px;
       text-align: right;
       overflow-wrap: anywhere;
     }
@@ -443,7 +420,7 @@
       padding: 25px 12px;
       color: #63748a;
       text-align: center;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.6;
     }
 
@@ -549,9 +526,9 @@
 
     @media (max-width: 600px) {
       .app { padding: 14px; gap: 15px; }
-      .brand { gap: 11px; }
-      .mark { width: 50px; height: 50px; flex-basis: 50px; border-radius: 14px; font-size: 17px; }
-      .subtitle { gap: 5px; font-size: 14px; }
+      .brand { gap: 14px; }
+      .mark { width: 96px; height: 96px; flex-basis: 96px; border-radius: 28px; font-size: 28px; }
+      .subtitle { gap: 6px; font-size: 16px; }
       .summary { gap: 8px; }
       .metric { padding: 11px; }
       .metric-label { font-size: 11px; }
@@ -559,11 +536,6 @@
       .board { grid-template-columns: 1fr; }
       .column { min-height: 220px; }
       .footer { align-items: flex-start; flex-direction: column; }
-    }
-    h1 {
-      font-size: clamp(40px, 4.4vw, 76px) !important;
-      font-weight: 900 !important;
-      line-height: 1.05 !important;
     }
   </style>
 </head>
@@ -584,14 +556,11 @@
 
       <div class="right-head">
         <div class="head-tools">
-          <div class="live" id="connectionStatus">
-            <span class="dot"></span> CONECTANDO À PLANILHA
-          </div>
           <div class="controls">
             <button class="btn" id="fullscreenButton" type="button" aria-label="Ativar tela cheia">⛶ Tela cheia</button>
             <button class="btn" id="refreshButton" type="button">↻ Atualizar agora</button>
           </div>
-          <div class="refresh-status" id="refreshStatus">Carregando dados publicados…</div>
+          <div class="refresh-status" id="refreshStatus">Carregando dados publicados...</div>
         </div>
         <div class="datebox">
           <div class="time" id="clock">--:--</div>
@@ -604,7 +573,7 @@
 
     <main class="board" id="board">
       <section class="column" style="grid-column:1/-1">
-        <div class="empty">Conectando à planilha publicada…</div>
+        <div class="empty">Conectando à planilha publicada...</div>
       </section>
     </main>
 
@@ -780,8 +749,6 @@
 
     function renderSummary() {
       const open = plans.filter(plan => plan.stage !== "concluido").length;
-      const running = plans.filter(plan => plan.stage === "acao").length;
-      const measuring = plans.filter(plan => plan.stage === "medicao").length;
       const done = plans.filter(plan => plan.stage === "concluido").length;
 
       const metrics = [
@@ -793,7 +760,7 @@
         `<div class="metric">
           <div>
             <div class="metric-label">${metric[0]}</div>
-            <div class="metric-value" style="color:${metric[3]}">${dataLoaded ? metric[1] : "—"}</div>
+            <div class="metric-value" style="color:${metric[3]}">${dataLoaded ? metric[1] : "-"}</div>
           </div>
           <div class="metric-icon" style="color:${metric[3]}">${metric[2]}</div>
         </div>`
@@ -807,7 +774,7 @@
         board.innerHTML = `<section class="error-panel">
           <strong>Não foi possível sincronizar os dados agora.</strong><br>
           ${escapeHtml(message)}
-          <br>Confira a publicação da aba e use “Atualizar agora” para tentar novamente.
+          <br>Confira a publicação da aba e use "Atualizar agora" para tentar novamente.
         </section>`;
         return;
       }
@@ -853,7 +820,7 @@
             stageContent = `
               <div class="task-title-label">MEDINDO RESULTADOS</div>
               <p class="desc"><strong>Resultado:</strong> ${escapeHtml(plan.resultado || "Aguardando registro do resultado")}</p>
-                  <p class="desc"><strong>Ação em execução:</strong> ${escapeHtml(plan.acao || "Não informado")}</p>`;
+              <p class="desc"><strong>Ação em execução:</strong> ${escapeHtml(plan.acao || "Não informado")}</p>`;
           }
 
           return `
@@ -928,12 +895,6 @@
           </div>
           <div class="completed-cards">${completedCards}</div>
         </section>`;
-    }
-
-    function setConnection(message, connected) {
-      const status = document.getElementById("connectionStatus");
-      status.innerHTML =
-        `<span class="dot${connected ? " ok" : ""}"></span> ${escapeHtml(message)}`;
     }
 
     async function loadPublishedTable() {
@@ -1040,10 +1001,9 @@
       const currentRequest = ++requestNumber;
       const button = document.getElementById("refreshButton");
       button.disabled = true;
-      button.textContent = "↻ Carregando…";
-      setConnection("CONECTANDO À PLANILHA", false);
+      button.textContent = "↻ Carregando...";
       document.getElementById("refreshStatus").textContent =
-        "Consultando a aba publicada…";
+        "Consultando a aba publicada...";
 
       try {
         const rows = await loadPublishedTable();
@@ -1053,7 +1013,6 @@
         dataLoaded = true;
         renderSummary();
         renderBoard();
-        setConnection("PLANILHA CONECTADA", true);
 
         const now = new Intl.DateTimeFormat("pt-BR", {
           hour: "2-digit",
@@ -1068,7 +1027,6 @@
 
         dataLoaded = false;
         renderSummary();
-        setConnection("FALHA NA CONEXÃO", false);
         document.getElementById("refreshStatus").textContent =
           "Atualização falhou. Tente novamente pelo botão.";
 
